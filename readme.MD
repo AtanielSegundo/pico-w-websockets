@@ -1,6 +1,3 @@
-Segue o README.md com correções de português e pequenas padronizações:
-
-```markdown
 # Pico W WebSockets
 
 A lightweight framework para Raspberry Pi Pico W que simplifica:
@@ -334,5 +331,4 @@ Sinta‑se à vontade para abrir **issues**, enviar **pull requests** ou sugerir
 – René Nyffenegger (`b64.h`)
 – Steve Reid (`tenysha1.h`)
 
-```
 ```
