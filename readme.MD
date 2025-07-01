@@ -222,21 +222,6 @@ void create_index_response(char* buf, size_t len) {
 }
 ```
 
----
-
-## 🖼️ Paginas hospedadas
-
-Capturas de tela das páginas criadas no exemplo:
-
-| Página                       | Imagem                                                                                          |
-| ---------------------------- | ----------------------------------------------------------------------------------------------- |
-| **Chat** (`/`)               | ![Chat](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/chat.png)          |
-| **Mouse Tracker** (`/mouse`) | ![Mouse Tracker](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/mouse.png) |
-| **Status** (`/status`)       | ![Status](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/status.png)       |
-
----
-
-
 ### Captive Portal
 
 Monitora URLs típicas de detecção de captive portal:
@@ -295,13 +280,16 @@ char* ws_get_client_route(ws_client_tpcb wc);
 
 ## 🖥️ Rotas de exemplo
 
-| Rota      | Página            | Descrição                                                    |
-| --------- | ----------------- | ------------------------------------------------------------ |
-| `/`       | **Chat**          | Chat simples com input e log de mensagens.                   |
-| `/mouse`  | **Mouse Tracker** | Envia coordenadas do mouse para o Pico e exibe no navegador. |
-| `/status` | **Uptime Status** | Atualiza tempo de execução via WebSocket em tempo real.      |
+Capturas de tela das páginas criadas no exemplo:
+
+| Página                       | Imagem                                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Chat** (`/`)               | ![Chat](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/chat.png)          |
+| **Mouse Tracker** (`/mouse`) | ![Mouse Tracker](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/mouse.png) |
+| **Status** (`/status`)       | ![Status](https://github.com/AtanielSegundo/pico-w-websockets/raw/main/assets/status.png)       |
 
 ---
+
 
 ## 🔐 Criptografia
 
