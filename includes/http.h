@@ -5,7 +5,6 @@
 #include <string.h>
 #include "pico/stdlib.h"
 #include "lwip/tcp.h"
-#include "common.h"
 
 extern char dnss_captive_site[64];
 #define KB(v) (v*1024U)

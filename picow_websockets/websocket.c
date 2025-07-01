@@ -222,15 +222,10 @@ err_t websocket_schema_upgrade(char* payload_buffer,struct tcp_pcb *tpcb, struct
         char *line_end = strstr(payload_buffer, "\r\n");
         if (!line_end) line_end = payload_buffer + len;
         *line_end = '\0';
-        
-        printf("[DEBUG] payload: %s\n",payload_buffer);
-
         char* route = (char*)malloc(64*sizeof(char));
         char method[8];
         sscanf(payload_buffer, "%7s %63s", method, route);
-
         ws_connected_clients->items[ws_connected_clients->count++] = (ws_client){.tpcb=tpcb,.route=route};
-        printf("[DEBUG] Added route: %s\n",route);
     }        
     pbuf_free(p);
     return err;
