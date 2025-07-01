@@ -56,7 +56,7 @@ Prover, com **poucas linhas de código**, um servidor HTTP + WebSockets no Pico�
 
 ---
 
-## 📝 Exemplo de uso (`src/main.c`)
+## 📝 Exemplo de uso (`main.c`)
 
 ```c
 #include <stdio.h>
@@ -333,5 +333,3 @@ Sinta‑se à vontade para abrir **issues**, enviar **pull requests** ou sugerir
 – Ataniel Silva Santos Segundo
 – René Nyffenegger (`b64.h`)
 – Steve Reid (`tenysha1.h`)
-
-```
