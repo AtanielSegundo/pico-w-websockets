@@ -325,7 +325,7 @@ Usadas no cálculo de `Sec-WebSocket-Accept` durante o handshake.
 
 ## 🤝 Contribuições
 
-Sinta‑se à vontade para abrir **issues**, enviar **pull requests** ou sugerir **novas rotas** e **funcionalidades**!
+Sinta‑se à vontade para abrir **issues**, enviar **pull requests** ou adicionar **novos exemplos** e **funcionalidades**!
 
 ---
 
