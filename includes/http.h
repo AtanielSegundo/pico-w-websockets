@@ -12,7 +12,7 @@ extern char dnss_captive_site[64];
 #define HTTP_RESPONSE_BUFFER_SIZE KB(4)
 #define PAYLOAD_TEMP_BUFFER_SIZE  KB(4)
 
-typedef void(*route_response_handler_t)(char* http_response_buffer, size_t http_response_len);
+typedef void(*route_response_handler_t)(char* query_parameters, char* http_response_buffer, size_t http_response_len);
 typedef err_t(*new_schema_handler_t)(char* payload_buffer,struct tcp_pcb *tpcb, struct pbuf *p);
 
 typedef struct {

@@ -87,23 +87,34 @@ static err_t http_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_
     
     memcpy(payload_temp_buff, p->payload, len);
     payload_temp_buff[len] = '\0';
-
+    
     
     for (size_t i = 0; i < new_schemas_routes->count; ++i){
         if(strstr(payload_temp_buff,new_schemas_routes->items[i].new_schema)){
             return new_schemas_routes->items[i].new_schema_handler(payload_temp_buff,tpcb,p);
         }
     }
-
+    
     char *line_end = strstr(payload_temp_buff, "\r\n");
     if (!line_end) line_end = payload_temp_buff + len;
     *line_end = '\0';
+    
+    
+    char method[8], path[256];
+    char query_parameters[512] = {0};
+    char *query_params_point = strstr(payload_temp_buff, "?");
 
-    char method[8], path[64];
-    if (sscanf(payload_temp_buff, "%7s %63s", method, path) != 2) {
-        goto send_404;
+    if(query_params_point){
+        *query_params_point = ' ';
+        if (sscanf(payload_temp_buff, "%7s %255s %511s", method, path, query_parameters) != 3) {
+            goto send_404;
+        }
+    } else{
+        if (sscanf(payload_temp_buff, "%7s %255s", method, path) != 2) {
+            goto send_404;
+        }
     }
-
+    
     if (dns_captive_site_response(tpcb, p, payload_temp_buff)) {
         pbuf_free(p);
         tcp_close(tpcb);
@@ -134,7 +145,7 @@ static err_t http_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_
 
                 http_route_item_t found = shget(http_routes_hmap,path);
                 if (found.route_response_handler){
-                    found.route_response_handler(http_response, sizeof(http_response));
+                    found.route_response_handler(query_parameters,http_response, sizeof(http_response));
                     tcp_write(tpcb, http_response, strlen(http_response),TCP_WRITE_FLAG_COPY);
                     tcp_output(tpcb);
                     pbuf_free(p);

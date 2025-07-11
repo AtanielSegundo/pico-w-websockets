@@ -27,35 +27,42 @@ static size_t get_mac_ascii(int idx, size_t chr_off, size_t chr_len, char *dest_
     return dest - dest_in;
 }
 
+ip4_addr_t setup_connect_to_wifi(const char *ssid, const char *password, uint32_t auth_mode) {
+    if (cyw43_arch_init()) {
+        printf("Erro: falhou ao inicializar o módulo Wi-Fi.\n");
+        return (ip4_addr_t){0};
+    }
+    cyw43_arch_enable_sta_mode();
+    
+    while (cyw43_arch_wifi_connect_blocking(ssid, password, auth_mode) != 0) {
+        printf("Tentando reconectar a '%s'...\n", ssid);
+        sleep_ms(500);
+    }
+
+    struct netif *sta_if = &cyw43_state.netif[CYW43_ITF_STA];
+    while (ip4_addr_isany_val(*netif_ip4_addr(sta_if))) {
+        sleep_ms(100);
+    }
+
+    ip4_addr_t ip = *netif_ip4_addr(sta_if);
+    
+    return ip;
+}
 
 /// auth_mode : CYW43_AUTH_WPA2_AES_PSK or CYW43_AUTH_OPEN
-int setup_connect_to_wifi(const char *ssid,
+ip4_addr_t setup_connect_to_wifi_with_mdns(const char *ssid,
                           const char *password,
                           const char *site_name,
                           uint32_t auth_mode) {
-    if (cyw43_arch_init()) {
-        printf("Erro: falhou ao inicializar o módulo Wi-Fi.\n");
-        return -1;
-    }
-    cyw43_arch_enable_sta_mode();
     
     char hostname[sizeof(CYW43_HOST_NAME) + 4];
     memcpy(&hostname[0], CYW43_HOST_NAME, sizeof(CYW43_HOST_NAME) - 1);
     get_mac_ascii(CYW43_HAL_MAC_WLAN0, 8, 4, &hostname[sizeof(CYW43_HOST_NAME) - 1]);
     hostname[sizeof(hostname) - 1] = '\0';
     netif_set_hostname(&cyw43_state.netif[CYW43_ITF_STA], hostname);
+    
+    ip4_addr_t ip = setup_connect_to_wifi(ssid,password,auth_mode);
 
-    while (cyw43_arch_wifi_connect_blocking(ssid, password, auth_mode) != 0) {
-        printf("Tentando reconectar a '%s'...\n", ssid);
-        sleep_ms(500);
-    }
-    struct netif *sta_if = &cyw43_state.netif[CYW43_ITF_STA];
-    while (ip4_addr_isany_val(*netif_ip4_addr(sta_if))) {
-        sleep_ms(100);
-    }
-    ip4_addr_t ip = *netif_ip4_addr(sta_if);
-    printf("Wi-Fi conectado: SSID='%s', IP='%s'\n",
-           ssid, ip4addr_ntoa(&ip));
     // Setup mdns
     #if LWIP_MDNS_RESPONDER
             cyw43_arch_lwip_begin();
@@ -70,7 +77,8 @@ int setup_connect_to_wifi(const char *ssid,
         #endif
             cyw43_arch_lwip_end();
     #endif
-    return 0;
+
+    return ip;
 }
 
 #define MAX_SCAN_RESULTS 32
