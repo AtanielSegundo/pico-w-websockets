@@ -73,40 +73,42 @@ Prover, com **poucas linhas de código**, um servidor HTTP + WebSockets no Pico�
 char temp_buffer[512];
 #define LED_PIN 11
 
-// Inverte string (in‑place)
+// Inverte string (in-place)
 void reverse_msg(char *str, size_t len) {
     for (int i = 0, j = len - 1; i < j; i++, j--) {
-        char tmp = str[i];
+        char temp = str[i];
         str[i] = str[j];
-        str[j] = tmp;
+        str[j] = temp;
     }
 }
 
 // ROTAS HTTP
-void create_index_response(char* buffer, size_t len) {
+
+void create_index_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER INDEX_BODY);
 }
 
-void create_status_response(char* buffer, size_t len) {
+void create_status_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER STATUS_BODY);
 }
 
-void create_mouse_response(char* buffer, size_t len) {
+void create_mouse_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER MOUSE_BODY);
 }
 
 // HANDLERS DE WEBSOCKET
+
 void on_text(ws_client_tpcb client, uint8_t* msg, size_t len) {
     const char* route = ws_get_client_route(client);
 
     if (strcmp(route, "/mouse") == 0) {
         // Recebido do navegador: posição do mouse
-        printf("MOUSE (X,Y) = (%.*s)\n", (int)len, msg);
+        printf("MOUSE (X,Y) = (%.*s)\n", len, msg);
     } else {
-        // Outros: inverte e envia de volta
+        // Resto: inverte e envia de volta
         reverse_msg((char*)msg, len);
         // Feedback visual
-        gpio_put(LED_PIN, !gpio_get(LED_PIN));
+        gpio_put(LED_PIN,!gpio_get(LED_PIN));
     }
 
     ws_send_message(client, WS_OP_TEXT, msg, len);
@@ -114,33 +116,33 @@ void on_text(ws_client_tpcb client, uint8_t* msg, size_t len) {
 
 void on_ping(ws_client_tpcb client, uint8_t* msg, size_t len) {
     ws_get_client_ip(client, temp_buffer, sizeof(temp_buffer));
-    printf("[INFO] PING recebido, PONG enviado | IP %s\n", temp_buffer);
+    printf("[INFO] PING RECEBIDO, PONG ENVIADO | IP %s\n", temp_buffer);
 }
 
 void on_pong(ws_client_tpcb client, uint8_t* msg, size_t len) {
     ws_get_client_ip(client, temp_buffer, sizeof(temp_buffer));
-    printf("[INFO] PONG recebido | IP %s\n", temp_buffer);
+    printf("[INFO] PONG RECEBIDO | IP %s\n", temp_buffer);
 }
 
 void on_upgrade(ws_client_tpcb client, uint8_t* msg, size_t len) {
     ws_get_client_ip(client, temp_buffer, sizeof(temp_buffer));
-    printf("CLIENTE conectado | IP %s\n", temp_buffer);
+    printf("CLIENTE CONECTADO | IP %s\n", temp_buffer);
     ws_send_message(client, WS_OP_TEXT, "[INFO] CONECTADO AO SERVIDOR", 29);
 }
 
 void on_close(ws_client_tpcb client, uint8_t* msg, size_t len) {
     ws_get_client_ip(client, temp_buffer, sizeof(temp_buffer));
-    printf("CLIENTE desconectado | IP %s\n", temp_buffer);
+    printf("CLIENTE DESCONECTADO | IP %s\n", temp_buffer);
 }
 
 int main() {
     stdio_init_all();
 
-    // Inicializa LED de demonstração
+    // Inicializando LED de demonstração
     gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
+    gpio_set_dir(LED_PIN,GPIO_OUT);
 
-    // Inicializa Access Point Wi‑Fi
+    // Inicializa ponto de acesso Wi-Fi
     setup_access_point("PicoW-Websockets", "mysockets123", "examples.local");
 
     // Registra rotas HTTP
@@ -149,7 +151,7 @@ int main() {
     add_http_route("/status", create_status_response);
     add_http_route("/mouse",  create_mouse_response);
 
-    // Configura WebSocket
+    // WebSocket: registra esquema e eventos
     add_new_schema_route("websocket", websocket_schema_upgrade);
     ws_add_on_text_handler(on_text);
     ws_add_on_upgrade_handler(on_upgrade);
@@ -166,17 +168,18 @@ int main() {
         cyw43_arch_poll();
 
         // Envia "uptime" a cada segundo
-        if (absolute_time_diff_us(last, get_absolute_time()) >= 1_000_000) {
+        if (absolute_time_diff_us(last, get_absolute_time()) >= 1000000) {
             last = get_absolute_time();
+
             uint32_t ms = to_ms_since_boot(get_absolute_time());
-            uint32_t h = ms / 3_600_000;
-            uint32_t m = (ms / 60_000) % 60;
-            uint32_t s = (ms / 1_000) % 60;
+            uint32_t h = ms / 3600000;
+            uint32_t m = (ms / 60000) % 60;
+            uint32_t s = (ms / 1000) % 60;
 
             char msg[32];
-            int len = snprintf(msg, sizeof(msg),
-                               "status:%02u:%02u:%02u", h, m, s);
-            ws_send_to_all_clients("/status", WS_OP_TEXT, (uint8_t*)msg, len);
+            int len = snprintf(msg, sizeof(msg), "status:%02u:%02u:%02u", h, m, s);
+
+            ws_send_to_all_clients("/status", WS_OP_TEXT, msg, len);
         }
 
         sleep_ms(5);
