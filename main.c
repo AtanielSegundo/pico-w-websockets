@@ -23,15 +23,15 @@ void reverse_msg(char *str, size_t len) {
 
 // ROTAS HTTP
 
-void create_index_response(char* buffer, size_t len) {
+void create_index_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER INDEX_BODY);
 }
 
-void create_status_response(char* buffer, size_t len) {
+void create_status_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER STATUS_BODY);
 }
 
-void create_mouse_response(char* buffer, size_t len) {
+void create_mouse_response(char* query_params, char* buffer, size_t len) {
     snprintf(buffer, len, HTTP_HEADER MOUSE_BODY);
 }
 
